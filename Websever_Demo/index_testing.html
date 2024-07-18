@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Display Current Time</title>
+    <style>
+        #datetime {
+            font-size: 50px;
+        }
+        .detail{
+            font-size: 20px;
+            border-radius: 25px;
+            background-color: black;
+            color: white;
+            margin: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+        .morning{
+            color: aqua;
+            text-align: center;
+            font-family: 'Roboto', sans-serif;
+        }
+        .afternoon{
+            color:bisque;
+            text-align: center;
+            font-family: 'Roboto', sans-serif;
+        }
+        .evening{
+            color: cadetblue;
+            text-align: center;
+            font-family: 'Roboto', sans-serif;
+        }
+
+    </style>
+  </head>
+  <body>
+    <span id="datetime"></span>
+    <p class="detail"></p>
+
+    <script>
+      // Create a function to update the time
+      function updateTime() {
+        // Create a new `Date` object
+        const now = new Date();
+
+        // Get the current hours, minutes, and seconds
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+
+        // Format the time as HH:MM:SS
+        const currentTime = `${hours}:${minutes}:${seconds}`;
+
+        // Display the current time in the span
+        document.getElementById('datetime').innerText = currentTime;
+        
+        // Log the current time to the console
+        console.log(currentTime);
+
+        if (currentTime >= "00:00:00" && currentTime <= "11:59:59") {
+          //document.getElementsByClassName("detail")[0].innerText = "Good morning";
+          document.getElementsByClassName("detail")[0].innerHTML = `<p class = "morning">Good morning &#127774;</p>`;
+        } else if (currentTime >= "12:00:00" && currentTime <= "17:59:59") {
+          //document.getElementsByClassName("detail")[0].innerText = "Good afternoon";
+          document.getElementsByClassName("detail")[0].innerHTML = `<p class = "afternoon">Good afternoon &#127766;</p>`;
+        } else if (currentTime >= "18:00:00" && currentTime <= "23:59:59") {
+          //document.getElementsByClassName("detail")[0].innerText = "Good evening";
+          document.getElementsByClassName("detail")[0].innerHTML = `<p class = "evening">Good evening &#127770;</p>`;
+        }
+      }
+
+      // Call the function immediately to display the time right away
+      updateTime();
+
+      // Update the time every second
+      setInterval(updateTime, 1000);
+    </script>
+  </body>
+</html>

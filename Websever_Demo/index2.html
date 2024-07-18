@@ -1,0 +1,215 @@
+<!DOCTYPE HTML><html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap');
+    html {
+      font-family: 'Roboto', sans-serif;
+      display: inline-block;
+      margin: 0px auto;
+      text-align: center;
+    }
+    h2 { 
+      font-size: 3.0rem; 
+    }
+    p { 
+      font-size: 3.0rem;     
+      margin-bottom: 10px;
+      margin-top: 0px;
+      font-family: 'Roboto', sans-serif;
+    }    
+    body {
+      height: 100vh;
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .page_container {
+      width: 70%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      margin: auto;
+      height: 100vh;
+    }
+    .status_icon img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .units { 
+      font-size: 1.2rem; 
+    }
+    .dht-labels, .soil-labels{
+      font-size: 1.5rem;
+      vertical-align: middle;
+    }
+    .mood_status{
+      font-size: 1.7rem;
+    }
+    .Soild_sensor,
+    .DHT11_sensor,
+    .mood_status {
+      border-radius: 25px;
+      background-color: transparent;
+      color: white;
+      margin: 10px 0;
+      width: 40%;
+    }
+    @media screen and (max-width: 767px){
+    body {
+      height: 100vh;
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+      .Soild_sensor,
+      .DHT11_sensor,
+      .mood_status {
+        border-radius: 25px;
+        background-color: black;
+        color: white;
+        margin: 10px 0;
+        width: 100%;
+      }
+      .status_icon img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+      .page_container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        margin: auto;
+        max-width: 50%;
+        padding: 10px; /* Added padding */
+      }
+      .soil-labels,
+      .dht-labels,
+      .units{
+        font-size: 20px;
+      }
+      .dht-labels{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+    }
+    #temperature, #humidity, #data{
+      font-size: 1.5rem;
+    }
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      font-size: 20px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      outline: none;
+      color: #fff;
+      background-color: #4CAF50;
+      border: none;
+      border-radius: 15px;
+    }
+    .button:hover {background-color: #3e8e41}
+    .button:active {
+      background-color: #3e8e41;
+      transform: translateY(4px);
+    }
+    .button.green {background-color: #4CAF50;}
+    .button.grey {background-color: #b0b0b0;}
+  </style>
+</head>
+<body>
+  <div class="page_container">
+    <div>
+      <img class="status_icon" src="https://cdn-icons-png.flaticon.com/512/483/483683.png" alt="happy_status">
+    </div>
+    <p class="mood_status" id="mood_data">Hi&#128075;, </p>
+    <div class="DHT11_sensor">
+      <p class = "temp">
+        <span class="dht-labels"><a style="color: #059e8a; font-size: 2.5rem;">&#127777;</a> Temperature: </span> 
+        <span id="temperature"> %TEMPERATURE% &deg;C</span>
+        <!--sup class="units">&deg;C</sup-->
+      </p>
+      <p class = "humidi"> 
+        <span class="dht-labels"><a style="color: #00add6; font-size: 2.5rem;">&#128167;</a> Humidity: </span>
+        <span id="humidity"> %HUMIDITY% &percnt;</span>
+        <!--sup class="units">&percnt;</sup-->
+      </p>
+    </div>
+    <p class="Soild_sensor">
+      <span class="soil-labels"><a>&#127792;</a>Soil Moisture: </span>
+      <span id="data"></span>
+    </p>
+    %BUTTONPLACEHOLDER%
+  </div>
+</body>
+<script>
+setInterval(function() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("temperature").innerHTML = this.responseText;
+    }
+  };
+  xhttp.open("GET", "/temperature", true);
+  xhttp.send();
+}, 10000);
+
+setInterval(function() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("humidity").innerHTML = this.responseText;
+    }
+  };
+  xhttp.open("GET", "/humidity", true);
+  xhttp.send();
+}, 10000);
+
+setInterval(function() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("data").innerHTML = this.responseText;
+    }
+  };
+  xhttp.open("GET", "/soil-moisture", true);
+  xhttp.send();
+}, 10000);
+
+function toggleButton() {
+  var xhttp = new XMLHttpRequest();
+  var button = document.getElementById("relayButton");
+  if (button.classList.contains("grey")) {
+    button.classList.remove("grey");
+    button.classList.add("green");
+    button.innerHTML = "Thank you &#x1F60A";
+    xhttp.open("GET", "/update?relay=relay&state=1", true);
+  } else {
+    button.classList.remove("green");
+    button.classList.add("grey");
+    button.innerHTML = "Give me some water, please &#128519;";
+    xhttp.open("GET", "/update?relay=relay&state=0", true);
+  }
+  xhttp.send();
+  setTimeout(function() {
+    if (button.innerHTML == "Thank you &#x1F60A") {
+      button.innerHTML = "Give me some water, please &#128519;";
+    } else {
+      button.innerHTML = "OK &#128076;";
+    }
+  }, 6000);
+}
+</script>
+</html>

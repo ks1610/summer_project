@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap');
+
+    body {
+        background-image: url('img/nature.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+    }
+    .page_container {
+      text-align: center;
+    }
+    .status_icon img {
+      width: 450px;
+      height: 350px;
+    }
+    p {
+      font-size: 24px;
+      font-family: 'Roboto', sans-serif;
+      padding: 10px 15px;
+      line-height: 1.5;
+    }
+    .Soild_sensor,
+    .DHT11_sensor,
+    .status_text {
+      border-radius: 25px;
+      background-color: black;
+      color: white; /* Ensure text is readable on blue background */
+      margin: 10px 0;
+      width: 550px;
+    }
+    .water button {
+      padding: 10px 20px;
+      border-radius: 20px;
+      background-color: rgba(107, 172, 107, 0.801);
+      color: white; /* Ensure text is readable on green background */
+      border: none;
+      cursor: pointer;
+      font-size: 24px;
+      font-family: 'Roboto', sans-serif;
+      width: 200px;
+    }
+     
+  </style>
+</head>
+<body>
+  <div class = "page_container">
+    <div class = "status_icon">
+      <img src="img/tree.png" alt="happy_status">
+    </div>
+    <div class = "status_text">
+      <p class = "mood">
+        <span id="status">Hello Spite, <br>
+          I'm good right now &#x1F60A</span>
+      </p>
+    </div>
+    <div class = "DHT11_sensor">
+      <p class = "DHT11_sensor_detai">
+        Temperature: 40 <br>
+        Humidity: 80
+      </p>
+    </div>
+    <div class = "Soild_sensor">
+      <p class = "Soild_sensor_detail">
+        Soil moisture: 100
+      </p>
+    </div>
+    <div class = "water">
+      <button>Water</button>
+    </div>
+  </div>
+</body>
+</html>
