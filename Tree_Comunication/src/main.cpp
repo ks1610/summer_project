@@ -107,7 +107,6 @@ const char index_html[] PROGMEM = R"rawliteral(
       font-family: 'Roboto', sans-serif;
     }    
     body {
-      height: 100vh;
       margin: 0;
       font-family: 'Roboto', sans-serif;
       display: flex;
@@ -115,6 +114,15 @@ const char index_html[] PROGMEM = R"rawliteral(
       align-items: center;
       overflow-x: hidden; /* Prevent horizontal overflow */
     }
+    /*body {
+        background-image: url('https://images.unsplash.com/photo-1517928260182-5688aead3066?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YXVyb3JhfGVufDB8fDB8fHww'); 
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-repeat: no-repeat;
+        background-size: cover;
+        height: 100vh;
+    }*/
     .page_container {
       width: 70%;
       display: flex;
@@ -141,8 +149,7 @@ const char index_html[] PROGMEM = R"rawliteral(
       font-size: 1.7rem;
     }
     .Soild_sensor,
-    .DHT11_sensor,
-     {
+    .DHT11_sensor{
       border-radius: 25px;
       background-color: black;
       color: white;
@@ -218,26 +225,102 @@ const char index_html[] PROGMEM = R"rawliteral(
       text-decoration: none;
       outline: none;
       color: #fff;
-      background-color: #4CAF50;
+      background-color: #4c814e;
       border: none;
       border-radius: 15px;
       width: 250px;
     }
     .button:hover {background-color: #3e8e41}
     .button:active {
-      background-color: #3e8e41;
+      background-color: #4c814e;
       transform: translateY(4px);
     }
-    .button.grey {background-color: #4CAF50;}
-    .button.green {background-color: #b0b0b0;}
+    .button.grey {background-color: #4c814e;}
+    .button.green {background-color: #7a7979e1;}
+    
+    #datetime {
+        font-size: 25px;
+        font-family: 'Roboto', sans-serif;
+        color: white;
+    }
+    .Date_Time_status{
+      background-color: black;
+      border-radius: 25px;
+        color: white;
+        padding: 10px;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+    .detail{
+        font-size: 10px;
+        border-radius: 25px;
+        background-color: black;
+        color: white;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+    .morning{
+        font-size: 20px;
+        color: aqua;
+        text-align: center;
+        font-family: 'Roboto', sans-serif;
+        margin-bottom: 0px;
+    }
+    .afternoon{
+        font-size: 20px;
+        color:bisque;
+        text-align: center;
+        font-family: 'Roboto', sans-serif;
+        margin-bottom: 0px;
+    }
+    .evening{
+        font-size: 20px;
+        color: cadetblue;
+        text-align: center;
+        font-family: 'Roboto', sans-serif;
+        margin-bottom: 0px;
+    }
+    body.morning-bg {
+        background-image: url('https://w0.peakpx.com/wallpaper/60/636/HD-wallpaper-tree-green-natural-nature-trees-thumbnail.jpg');
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-repeat: no-repeat;
+        background-size: cover;
+        height: 100vh;
+    }
+    body.afternoon-bg {
+        background-image: url('https://i.pinimg.com/736x/87/6e/fc/876efc60c78b1c936d7a2527589320e8.jpg');
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-repeat: no-repeat;
+        background-size: cover;
+        height: 100vh;
+    }
+    body.evening-bg {
+        background-image: url('https://images.unsplash.com/photo-1517928260182-5688aead3066?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YXVyb3JhfGVufDB8fDB8fHww');
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-repeat: no-repeat;
+        background-size: cover;
+        height: 100vh;
+    }
   </style>
 </head>
 <body>
   <div class="page_container">
+     <!--display time-->
     <div style = "margin-bottom: 10px;">
       <img class="status_icon" style = "width: 200px; height: 200px;"
         src="https://cdn-icons-png.flaticon.com/512/483/483683.png" alt="happy_status">
     </div>
+
+  <div class = "Date_Time_status">
+    <p class="detail"></p><!--display day status-->
+    <span id="datetime"></span>
+  </div>
     <!--p class="mood_status" id="mood_data" style = "margin-bottom: 10px; 
     padding: 10px 5px; 
     font-size: 20px;">Hi&#128075;, </p-->
@@ -268,6 +351,40 @@ const char index_html[] PROGMEM = R"rawliteral(
   </div>
 </body>
 <script>
+
+// Create a function to update the time
+function updateTime() {
+  // Create a new `Date` object
+  const now = new Date();
+  // Get the current hours, minutes, and seconds
+  const hours = now.getHours().toString().padStart(2, '0');
+  const minutes = now.getMinutes().toString().padStart(2, '0');
+  const seconds = now.getSeconds().toString().padStart(2, '0');
+  // Format the time as HH:MM:SS
+  const currentTime = `${hours}:${minutes}:${seconds}`;
+  // Display the current time in the span
+  document.getElementById('datetime').innerText = currentTime;
+  
+  // Log the current time to the console
+  console.log(currentTime);
+  if (currentTime >= "00:00:00" && currentTime <= "11:59:59") {
+    document.getElementsByClassName("detail")[0].innerHTML = `<p class="morning">Hi, Good morning &#127774;</p>`;
+    document.body.className = "morning-bg"; // Reset to default background
+  }
+  else if (currentTime >= "12:00:00" && currentTime <= "17:59:59") {
+    document.getElementsByClassName("detail")[0].innerHTML = `<p class="afternoon">Hi, Good afternoon &#127773;</p>`;
+    document.body.className = "afternoon-bg"; // Reset to default background
+  }else if (currentTime >= "18:00:00" && currentTime <= "23:59:59") {
+    document.getElementsByClassName("detail")[0].innerHTML = `<p class="evening">Hi, Good evening &#127770;</p>`;
+    document.body.className = "evening-bg"; // Set evening background
+  }
+}
+// Call the function immediately to display the time right away
+updateTime();
+// Update the time every second
+setInterval(updateTime, 1000);
+
+//create function to get temperature
 setInterval(function() {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
@@ -279,6 +396,7 @@ setInterval(function() {
   xhttp.send();
 }, 10000);
 
+//create function to get humidity
 setInterval(function() {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
@@ -290,6 +408,7 @@ setInterval(function() {
   xhttp.send();
 }, 10000);
 
+//create function to get soil moisture
 setInterval(function() {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
@@ -301,6 +420,7 @@ setInterval(function() {
   xhttp.send();
 }, 10000);
 
+//create function to get mood status
 setInterval(function() {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
@@ -312,6 +432,7 @@ setInterval(function() {
   xhttp.send();
 }, 10000);
 
+//create function to toggle Relay 
 function toggleButton() {
   var xhttp = new XMLHttpRequest();
   var button = document.getElementById("relayButton");
