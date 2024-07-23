@@ -1,3 +1,5 @@
+
+
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <Adafruit_Sensor.h>
@@ -9,9 +11,19 @@ const char* password = "khanhha@123";
 
 #define DHTPIN 27     // Digital pin connected to the DHT sensor
 #define SOIL_MOISTURE_PIN 34  // Analog pin connected to the soil moisture sensor
-const int relay = 26; // Digital pin connected to Relay
+/*const int relay = 26; // Digital pin connected to Relay
+const int relay1 = 25; // Digital pin connected to Relay
+//const int relay1 = 35; // Digital pin connected to Relay*/
 
-#define RELAY_NO true
+
+// Set to true to define Relay as Normally Open (NO)
+#define RELAY_NO    true
+
+// Set number of relays
+#define NUM_RELAYS  2
+
+// Assign each GPIO to a relay
+int relayGPIOs[NUM_RELAYS] = {25, 26};
 
 #define DHTTYPE DHT11 // DHT 11
 // Uncomment the type of sensor in use:
@@ -20,11 +32,42 @@ const int relay = 26; // Digital pin connected to Relay
 
 DHT dht(DHTPIN, DHTTYPE);
 
-const char* PARAM_INPUT_1 = "relay";
+const char* PARAM_INPUT_1 = "relay";  
 const char* PARAM_INPUT_2 = "state";
+
+/*const char* PARAM_INPUT_1_1 = "relay1";
+const char* PARAM_INPUT_2_1 = "state1";*/
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
+
+String relayState(int numRelay){
+  if(RELAY_NO){
+    if(digitalRead(relayGPIOs[numRelay-1])){
+      return "";
+    }
+    else {
+      return "checked";
+    }
+  }
+  else {
+    if(digitalRead(relayGPIOs[numRelay-1])){
+      return "checked";
+    }
+    else {
+      return "";
+    }
+  }
+  return "";
+}
+
+String relayState25() {
+  if(RELAY_NO) {
+    return digitalRead(25) ? "off" : "on";
+  } else {
+    return digitalRead(25) ? "on" : "off";
+  }
+}
 
 String readDHTTemperature() {
   float t = dht.readTemperature();
@@ -61,13 +104,21 @@ String readSoilMoisture() {
   }
 }
 
-String relayState() {
+/*String relayState() {
   if (RELAY_NO) {
     return digitalRead(relay) ? "stop" : "water";
   } else {
     return digitalRead(relay) ? "water" : "stop";
   }
 }
+
+String relayState1() {
+  if (RELAY_NO1) {
+    return digitalRead(relay1) ? "fan off" : "fan on";
+  } else {
+    return digitalRead(relay1) ? "fan on" : "fan off";
+  }
+}*/
 
 String getMoodStatus() {
   double soilMoisture = analogRead(SOIL_MOISTURE_PIN);
@@ -181,8 +232,8 @@ const char index_html[] PROGMEM = R"rawliteral(
         background-color: black;
         color: white;
         margin: 10px;
-        width: 90%;
         overflow: hidden; /* Ensure content doesn't overflow */
+        width: 90%;
       }
       .page_container {
         width: 90%;
@@ -206,7 +257,22 @@ const char index_html[] PROGMEM = R"rawliteral(
       }
       .humidi,
       .temp,
-      .Soild_sensor{
+      .Soild_sensor{        
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+      
+      .Relay_State{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: row-reverse;
+        margin: 10px;
+      }
+
+      .Temp_Soil_Sensor{
         display: flex;
         justify-content: center;
         align-items: center;
@@ -218,7 +284,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     }
     .button {
       display: inline-block;
-      padding: 10px 20px;
+      padding: 10px 10px;
       font-size: 20px;
       cursor: pointer;
       text-align: center;
@@ -228,16 +294,18 @@ const char index_html[] PROGMEM = R"rawliteral(
       background-color: #4c814e;
       border: none;
       border-radius: 15px;
-      width: 250px;
+      width: 200px;
+      margin-right: 10px;
     }
     .button:hover {background-color: #3e8e41}
     .button:active {
       background-color: #4c814e;
       transform: translateY(4px);
+      padding: 20px 10px;
     }
     .button.grey {background-color: #4c814e;}
     .button.green {background-color: #7a7979e1;}
-    
+
     #datetime {
         font-size: 25px;
         font-family: 'Roboto', sans-serif;
@@ -307,6 +375,13 @@ const char index_html[] PROGMEM = R"rawliteral(
         background-size: cover;
         height: 100vh;
     }
+    .switch {position: relative; display: inline-block; width: 120px; height: 68px} 
+    .switch input {display: none}
+    .slider {position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; border-radius: 25px}
+    .slider:before {position: absolute; content: ""; height: 52px; width: 52px; left: 8px; bottom: 8px; background-color: #fff; -webkit-transition: .4s; transition: .4s; border-radius: 25px}
+    input:checked+.slider {background-color: #83e0aae8}
+    input:checked+.slider:before {-webkit-transform: translateX(52px); -ms-transform: translateX(52px); transform: translateX(52px)}
+
   </style>
 </head>
 <body>
@@ -328,26 +403,36 @@ const char index_html[] PROGMEM = R"rawliteral(
     <p class="mood_status" id="mood_data" style = "margin-bottom: 10px; 
     padding: 10px 5px; 
     font-size: 20px;">%MOODPLACEHOLDER%</p>
-    
-    <div class="DHT11_sensor" style = "margin-bottom: 10px;
-    padding: 10px 5px;">
-      <p class = "temp">
-        <span class="dht-labels">&#127777; Temperature: </span> 
-        <span id="temperature"> %TEMPERATURE% <!--sup>&deg;C</sup--></span>
-        <sup class="units" style = "font-size: 18px;">&deg;C</sup>
-      </p>
-      <p class = "humidi"> 
-        <span class="dht-labels">&#128167; Humidity: </span>
-        <span id="humidity"> %HUMIDITY% <!--sup>&percnt;</sup--></span>
-        <sup class="units" style = "font-size: 18px;">&percnt;</sup>
-      </p>
+    <div class = "Temp_Soil_Sensor">
+      <div class="DHT11_sensor" style = "margin-bottom: 10px;
+        padding: 10px 5px;">
+        <p class = "temp">
+          <span class="dht-labels">&#127777; Temperature: </span>
+          <div> 
+            <span id="temperature"> %TEMPERATURE% <!--sup>&deg;C</sup--></span>
+            <sup class="units" style = "font-size: 18px;">&deg;C</sup>
+          </div>
+        </p>
+        <p class = "humidi">
+          <span class="dht-labels">&#128167; Humidity: </span>
+          <div>
+            <span id="humidity"> %HUMIDITY% <!--sup>&percnt;</sup--></span>
+            <sup class="units" style = "font-size: 18px;">&percnt;</sup>
+          </div>
+        </p>
+      </div>
+      <div class = soil>
+        <p class="Soild_sensor" style = "margin-bottom: 10px;
+          padding: 10px 5px;
+          height: 145px;">
+          <span class="soil-labels"><a>&#127792;</a>Soil Moisture: </span>
+          <span id="data">--</span>
+        </p>
+      </div>
     </div>
-    <p class="Soild_sensor" style = "margin-bottom: 10px;
-    padding: 10px 5px;">
-      <span class="soil-labels"><a>&#127792;</a>Soil Moisture: </span>
-      <span id="data"></span>
-    </p>
-    %BUTTONPLACEHOLDER%
+    <div class = "Relay_State">
+      %BUTTONPLACEHOLDER%
+    </div>
   </div>
 </body>
 <script>
@@ -432,6 +517,7 @@ setInterval(function() {
   xhttp.send();
 }, 10000);
 
+/*
 //create function to toggle Relay 
 function toggleButton() {
   var xhttp = new XMLHttpRequest();
@@ -454,8 +540,49 @@ function toggleButton() {
     }/* else {
       button.innerHTML = "OK &#128076;";
     }*/
+/*  }, 6000);
+}
+
+//added new function for Fan relay
+function toggleCheckbox(element) {
+  var xhr = new XMLHttpRequest();
+  if(element.checked){ xhr.open("GET", "/update?relay1="+element.id+"&state1=1", true); }
+  else { xhr.open("GET", "/update?relay1="+element.id+"&state1=0", true); }
+  xhr.send();
+}
+*/
+
+
+function toggleCheckbox(element) {
+  var xhr = new XMLHttpRequest();
+  if(element.checked){ xhr.open("GET", "/update?relay="+element.id+"&state=1", true); }
+  else { xhr.open("GET", "/update?relay="+element.id+"&state=0", true); }
+  xhr.send();
+}
+
+function toggleButton() {
+  var xhttp = new XMLHttpRequest();
+  var button = document.getElementById("relayButton");
+  if (button.classList.contains("grey")) {
+    button.classList.remove("grey");
+    button.classList.add("green");
+    button.innerHTML = "Thank you &#x1F60A";
+    xhttp.open("GET", "/update?relay=2&state=1", true);
+  } else {
+    button.classList.remove("green");
+    button.classList.add("grey");
+    button.innerHTML = "Give me some water, please &#128519;";
+    xhttp.open("GET", "/update?relay=2&state=0", true);
+  }
+  xhttp.send();
+  setTimeout(function() {
+    if (button.innerHTML == "Thank you &#x1F60A") {
+      button.innerHTML = "Give me some water, please &#128519;";
+    }
   }, 6000);
 }
+
+
 </script>
 </html>)rawliteral";
 
@@ -464,9 +591,11 @@ function toggleButton() {
 String processor(const String& var) {
   if (var == "TEMPERATURE") {
     return readDHTTemperature();
-  } else if (var == "HUMIDITY") {
+  } 
+  else if (var == "HUMIDITY") {
     return readDHTHumidity();
-  } else if (var == "BUTTONPLACEHOLDER") {
+  } 
+  /*else if (var == "BUTTONPLACEHOLDER") {
     String relayStateValue = relayState();
     //String buttonClass = (relayStateValue == "stop") ? "green" : "grey";
     String buttonClass = (relayStateValue == "stop") ? "grey" : "green";
@@ -474,9 +603,28 @@ String processor(const String& var) {
     String buttonText = (relayStateValue == "stop") ? "Give me some water, please &#128519;" : "OK &#128076;";
     String buttons = "<button id=\"relayButton\" class=\"button " + buttonClass + "\" onclick=\"toggleButton()\">" + buttonText + "</button>";
     return buttons;
-  } else if (var == "SOILMOISTURE") {
+  }
+  else if(var == "BUTTONPLACEHOLDER1"){
+    String buttons ="";
+    String relayStateValue = relayState1();
+    buttons+= "<label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"" + String() + "\" "+ relayStateValue +"><span class=\"slider\"></span></label>";
+    return buttons;
+  }*/
+
+  else if(var == "BUTTONPLACEHOLDER"){
+    String buttons ="";
+    buttons += "<label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"1\" "+ relayState(1) +"><span class=\"slider\"></span></label>";
+    String relayStateValue = relayState25();
+    String buttonClass = (relayStateValue == "off") ? "grey" : "green";
+    String buttonText = (relayStateValue == "off") ? "Give me some water, please &#128519;" : "Thank you &#x1F60A";
+    buttons += "<button id=\"relayButton\" class=\"button " + buttonClass + "\" onclick=\"toggleButton()\">" + buttonText + "</button>";
+    return buttons;
+  }
+
+  else if (var == "SOILMOISTURE") {
     return readSoilMoisture();
-  } else if (var == "MOODPLACEHOLDER") {
+  } 
+  else if (var == "MOODPLACEHOLDER") {
     return getMoodStatus();
   }
   return String();
@@ -488,12 +636,32 @@ void setup() {
 
   dht.begin();
 
+  /*
   pinMode(relay, OUTPUT);
   if (RELAY_NO) {
     digitalWrite(relay, HIGH);
   } else {
     digitalWrite(relay, LOW);
   }
+
+  pinMode(relay1, OUTPUT);
+  if (RELAY_NO1) {
+    digitalWrite(relay1, HIGH);
+  } else {
+    digitalWrite(relay1, LOW);
+  }
+  */
+
+  for(int i=0; i<NUM_RELAYS; i++){
+    pinMode(relayGPIOs[i], OUTPUT);
+    if(RELAY_NO){
+      digitalWrite(relayGPIOs[i], HIGH);
+    }
+    else{
+      digitalWrite(relayGPIOs[i], LOW);
+    }
+  }
+
 /*
   // Set up the ESP32 as an Access Point
   WiFi.softAP(ssid, password);
@@ -534,6 +702,7 @@ void setup() {
     request->send_P(200, "text/plain", getMoodStatus().c_str());
   });
   
+  /*
   // Send a GET request to <ESP_IP>/update?relay=<inputMessage>&state=<inputMessage2>
   server.on("/update", HTTP_GET, [](AsyncWebServerRequest *request) {
     String inputMessage;
@@ -559,6 +728,60 @@ void setup() {
     request->send(200, "text/plain", "OK");
   });
   
+  server.on("/update", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String inputMessage;
+    String inputParam;
+    String inputMessage2;
+    String inputParam2;
+    // GET input1 value on <ESP_IP>/update?relay=<inputMessage>
+    if (request->hasParam(PARAM_INPUT_1_1) & request->hasParam(PARAM_INPUT_2_1)) {
+      inputMessage = request->getParam(PARAM_INPUT_1_1)->value();
+      inputParam = PARAM_INPUT_1_1;
+      inputMessage2 = request->getParam(PARAM_INPUT_2_1)->value();
+      inputParam2 = PARAM_INPUT_2_1;
+      if(RELAY_NO1){
+        Serial.print("NO ");
+        digitalWrite(relay1, !inputMessage2.toInt());
+      }
+      else{
+        Serial.print("NC ");
+        digitalWrite(relay1, inputMessage2.toInt());
+      }
+    }
+    else {
+      inputMessage = "No message sent";
+      inputParam = "none";
+    }
+    Serial.println(inputMessage + inputMessage2);
+    request->send(200, "text/plain", "OK");
+  });*/
+
+  server.on("/update", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    String inputMessage;
+    String inputParam;
+    String inputMessage2;
+    String inputParam2;
+    // GET input1 value on <ESP_IP>/update?relay=<inputMessage>
+    if (request->hasParam(PARAM_INPUT_1) & request->hasParam(PARAM_INPUT_2)) {
+      inputMessage = request->getParam(PARAM_INPUT_1)->value();
+      inputParam = PARAM_INPUT_1;
+      inputMessage2 = request->getParam(PARAM_INPUT_2)->value();
+      inputParam2 = PARAM_INPUT_2;
+      if(RELAY_NO){
+        digitalWrite(relayGPIOs[inputMessage.toInt()-1], !inputMessage2.toInt());
+      }
+      else{
+        digitalWrite(relayGPIOs[inputMessage.toInt()-1], inputMessage2.toInt());
+      }
+    }
+    else {
+      inputMessage = "No message sent";
+      inputParam = "none";
+    }
+    Serial.println(inputMessage + inputMessage2);
+    request->send(200, "text/plain", "OK");
+  });
+
   // Start server
   server.begin();
 }
