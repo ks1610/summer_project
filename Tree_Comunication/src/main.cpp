@@ -1,5 +1,3 @@
-
-
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <Adafruit_Sensor.h>
@@ -11,11 +9,7 @@ const char* password = "khanhha@123";
 
 #define DHTPIN 27     // Digital pin connected to the DHT sensor
 #define SOIL_MOISTURE_PIN 34  // Analog pin connected to the soil moisture sensor
-/*const int relay = 26; // Digital pin connected to Relay
-const int relay1 = 25; // Digital pin connected to Relay
-//const int relay1 = 35; // Digital pin connected to Relay*/
-
-
+ 
 // Set to true to define Relay as Normally Open (NO)
 #define RELAY_NO    true
 
@@ -35,8 +29,6 @@ DHT dht(DHTPIN, DHTTYPE);
 const char* PARAM_INPUT_1 = "relay";  
 const char* PARAM_INPUT_2 = "state";
 
-/*const char* PARAM_INPUT_1_1 = "relay1";
-const char* PARAM_INPUT_2_1 = "state1";*/
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -103,22 +95,6 @@ String readSoilMoisture() {
     return String(data) + "%";
   }
 }
-
-/*String relayState() {
-  if (RELAY_NO) {
-    return digitalRead(relay) ? "stop" : "water";
-  } else {
-    return digitalRead(relay) ? "water" : "stop";
-  }
-}
-
-String relayState1() {
-  if (RELAY_NO1) {
-    return digitalRead(relay1) ? "fan off" : "fan on";
-  } else {
-    return digitalRead(relay1) ? "fan on" : "fan off";
-  }
-}*/
 
 String getMoodStatus() {
   double soilMoisture = analogRead(SOIL_MOISTURE_PIN);
@@ -278,24 +254,66 @@ const char index_html[] PROGMEM = R"rawliteral(
         align-items: center;
         flex-direction: row;
       }
+      .button {
+          display: inline-block;
+          padding: Opx 10px;
+          font-size: 25px;
+          cursor: pointer;
+          text-align: center;
+          text-decoration: none;
+          outline: none;
+          color: #fff;
+          background-color: #b9d5ba;
+          border: none;
+          border-radius: 15px;
+          width: 238px !important;
+          margin-right: 10px;
+      }
+      body.morning-bg {
+          background-image: url('https://w0.peakpx.com/wallpaper/60/636/HD-wallpaper-tree-green-natural-nature-trees-thumbnail.jpg');
+          /*-webkit-background-size: cover;
+          -moz-background-size: cover;
+          -o-background-size: cover;*/
+          background-repeat: no-repeat;
+          background-size: 100% 100% !important;
+          height: 100vh;
+      }
+      body.afternoon-bg {
+          background-image: url('https://i.pinimg.com/736x/87/6e/fc/876efc60c78b1c936d7a2527589320e8.jpg');
+          /*-webkit-background-size: cover;
+          -moz-background-size: cover;
+          -o-background-size: cover;*/
+          background-repeat: no-repeat;
+          background-size: 100% 100%  !important; 
+          height: 100vh;
+      }
+      body.evening-bg {
+          background-image: url('https://images.unsplash.com/photo-1517928260182-5688aead3066?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YXVyb3JhfGVufDB8fDB8fHww');
+          /*-webkit-background-size: cover;
+          -moz-background-size: cover;
+          -o-background-size: cover;*/
+          background-repeat: no-repeat;
+          background-size: 100% 100%  !important; 
+          height: 100vh;
+      }
     }
     #temperature, #humidity, #data {
       font-size: 1.5rem;
     }
     .button {
-      display: inline-block;
-      padding: 10px 10px;
-      font-size: 20px;
-      cursor: pointer;
-      text-align: center;
-      text-decoration: none;
-      outline: none;
-      color: #fff;
-      background-color: #4c814e;
-      border: none;
-      border-radius: 15px;
-      width: 200px;
-      margin-right: 10px;
+        display: inline-block;
+        padding: 0px 10px;
+        font-size: 25px;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+        outline: none;
+        color: #fff;
+        background-color: #b9d5ba;
+        border: none;
+        border-radius: 15px;
+        width: 329px;
+        margin-right: 10px;
     }
     .button:hover {background-color: #3e8e41}
     .button:active {
@@ -311,7 +329,10 @@ const char index_html[] PROGMEM = R"rawliteral(
         font-family: 'Roboto', sans-serif;
         color: white;
     }
-    .Date_Time_status{
+    .Date_Time_status, 
+    .mood_status, 
+    .DHT11_sensor,
+    .Soild_sensor{
       background-color: black;
       border-radius: 25px;
         color: white;
@@ -363,7 +384,7 @@ const char index_html[] PROGMEM = R"rawliteral(
         -moz-background-size: cover;
         -o-background-size: cover;
         background-repeat: no-repeat;
-        background-size: cover;
+        background-size: cover; 
         height: 100vh;
     }
     body.evening-bg {
@@ -372,7 +393,7 @@ const char index_html[] PROGMEM = R"rawliteral(
         -moz-background-size: cover;
         -o-background-size: cover;
         background-repeat: no-repeat;
-        background-size: cover;
+        background-size: cover; 
         height: 100vh;
     }
     .switch {position: relative; display: inline-block; width: 120px; height: 68px} 
@@ -381,7 +402,14 @@ const char index_html[] PROGMEM = R"rawliteral(
     .slider:before {position: absolute; content: ""; height: 52px; width: 52px; left: 8px; bottom: 8px; background-color: #fff; -webkit-transition: .4s; transition: .4s; border-radius: 25px}
     input:checked+.slider {background-color: #83e0aae8}
     input:checked+.slider:before {-webkit-transform: translateX(52px); -ms-transform: translateX(52px); transform: translateX(52px)}
-
+    
+    .Relay_State{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: row-reverse;
+      margin: 10px;
+    }
   </style>
 </head>
 <body>
@@ -595,21 +623,6 @@ String processor(const String& var) {
   else if (var == "HUMIDITY") {
     return readDHTHumidity();
   } 
-  /*else if (var == "BUTTONPLACEHOLDER") {
-    String relayStateValue = relayState();
-    //String buttonClass = (relayStateValue == "stop") ? "green" : "grey";
-    String buttonClass = (relayStateValue == "stop") ? "grey" : "green";
-    //String buttonText = (relayStateValue == "stop") ? "Stop" : "Water";
-    String buttonText = (relayStateValue == "stop") ? "Give me some water, please &#128519;" : "OK &#128076;";
-    String buttons = "<button id=\"relayButton\" class=\"button " + buttonClass + "\" onclick=\"toggleButton()\">" + buttonText + "</button>";
-    return buttons;
-  }
-  else if(var == "BUTTONPLACEHOLDER1"){
-    String buttons ="";
-    String relayStateValue = relayState1();
-    buttons+= "<label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"" + String() + "\" "+ relayStateValue +"><span class=\"slider\"></span></label>";
-    return buttons;
-  }*/
 
   else if(var == "BUTTONPLACEHOLDER"){
     String buttons ="";
@@ -636,21 +649,6 @@ void setup() {
 
   dht.begin();
 
-  /*
-  pinMode(relay, OUTPUT);
-  if (RELAY_NO) {
-    digitalWrite(relay, HIGH);
-  } else {
-    digitalWrite(relay, LOW);
-  }
-
-  pinMode(relay1, OUTPUT);
-  if (RELAY_NO1) {
-    digitalWrite(relay1, HIGH);
-  } else {
-    digitalWrite(relay1, LOW);
-  }
-  */
 
   for(int i=0; i<NUM_RELAYS; i++){
     pinMode(relayGPIOs[i], OUTPUT);
@@ -701,60 +699,6 @@ void setup() {
   server.on("/mood", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send_P(200, "text/plain", getMoodStatus().c_str());
   });
-  
-  /*
-  // Send a GET request to <ESP_IP>/update?relay=<inputMessage>&state=<inputMessage2>
-  server.on("/update", HTTP_GET, [](AsyncWebServerRequest *request) {
-    String inputMessage;
-    String inputMessage2;
-    String inputParam;
-    String inputParam2;
-    // GET input1 value on <ESP_IP>/update?relay=<inputMessage>&state=<inputMessage2>
-    if (request->hasParam(PARAM_INPUT_1) && request->hasParam(PARAM_INPUT_2)) {
-      inputMessage = request->getParam(PARAM_INPUT_1)->value();
-      inputParam = PARAM_INPUT_1;
-      inputMessage2 = request->getParam(PARAM_INPUT_2)->value();
-      inputParam2 = PARAM_INPUT_2;
-      if (RELAY_NO) {
-        digitalWrite(relay, !inputMessage2.toInt());
-      } else {
-        digitalWrite(relay, inputMessage2.toInt());
-      }
-    } else {
-      inputMessage = "No message sent";
-      inputParam = "none";
-    }
-    Serial.println(inputMessage + inputMessage2);
-    request->send(200, "text/plain", "OK");
-  });
-  
-  server.on("/update", HTTP_GET, [] (AsyncWebServerRequest *request) {
-    String inputMessage;
-    String inputParam;
-    String inputMessage2;
-    String inputParam2;
-    // GET input1 value on <ESP_IP>/update?relay=<inputMessage>
-    if (request->hasParam(PARAM_INPUT_1_1) & request->hasParam(PARAM_INPUT_2_1)) {
-      inputMessage = request->getParam(PARAM_INPUT_1_1)->value();
-      inputParam = PARAM_INPUT_1_1;
-      inputMessage2 = request->getParam(PARAM_INPUT_2_1)->value();
-      inputParam2 = PARAM_INPUT_2_1;
-      if(RELAY_NO1){
-        Serial.print("NO ");
-        digitalWrite(relay1, !inputMessage2.toInt());
-      }
-      else{
-        Serial.print("NC ");
-        digitalWrite(relay1, inputMessage2.toInt());
-      }
-    }
-    else {
-      inputMessage = "No message sent";
-      inputParam = "none";
-    }
-    Serial.println(inputMessage + inputMessage2);
-    request->send(200, "text/plain", "OK");
-  });*/
 
   server.on("/update", HTTP_GET, [] (AsyncWebServerRequest *request) {
     String inputMessage;
