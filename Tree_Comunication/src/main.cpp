@@ -128,7 +128,7 @@ const char index_html[] PROGMEM = R"rawliteral(
       font-size: 3.0rem; 
     }
     p { 
-      font-size: 3.0rem;     
+      font-size: 1.5rem;     
       margin-bottom: 10px;
       margin-top: 0px;
       font-family: 'Roboto', sans-serif;
@@ -141,15 +141,6 @@ const char index_html[] PROGMEM = R"rawliteral(
       align-items: center;
       overflow-x: hidden; /* Prevent horizontal overflow */
     }
-    /*body {
-        background-image: url('https://images.unsplash.com/photo-1517928260182-5688aead3066?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YXVyb3JhfGVufDB8fDB8fHww'); 
-        -webkit-background-size: cover;
-        -moz-background-size: cover;
-        -o-background-size: cover;
-        background-repeat: no-repeat;
-        background-size: cover;
-        height: 100vh;
-    }*/
     .page_container {
       width: 70%;
       display: flex;
@@ -296,9 +287,15 @@ const char index_html[] PROGMEM = R"rawliteral(
           background-size: 100% 100%  !important; 
           height: 100vh;
       }
+      .Soild_sensor{
+        height: 145px !important;
+      }
     }
     #temperature, #humidity, #data {
       font-size: 1.5rem;
+    }
+    .Soild_sensor{
+      height: 30px;
     }
     .button {
         display: inline-block;
@@ -339,6 +336,8 @@ const char index_html[] PROGMEM = R"rawliteral(
         padding: 10px;
         text-align: center;
         margin-bottom: 10px;
+        margin-right: 10px;
+        margin-left: 0px;
     }
     .detail{
         font-size: 10px;
@@ -371,30 +370,34 @@ const char index_html[] PROGMEM = R"rawliteral(
     }
     body.morning-bg {
         background-image: url('https://w0.peakpx.com/wallpaper/60/636/HD-wallpaper-tree-green-natural-nature-trees-thumbnail.jpg');
-        -webkit-background-size: cover;
+        /*-webkit-background-size: cover;
         -moz-background-size: cover;
         -o-background-size: cover;
         background-repeat: no-repeat;
         background-size: cover;
-        height: 100vh;
+        height: 100vh;*/
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center
     }
     body.afternoon-bg {
         background-image: url('https://i.pinimg.com/736x/87/6e/fc/876efc60c78b1c936d7a2527589320e8.jpg');
-        -webkit-background-size: cover;
+        /*-webkit-background-size: cover;
         -moz-background-size: cover;
         -o-background-size: cover;
         background-repeat: no-repeat;
         background-size: cover; 
-        height: 100vh;
+        height: 100vh;*/
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center
     }
     body.evening-bg {
         background-image: url('https://images.unsplash.com/photo-1517928260182-5688aead3066?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YXVyb3JhfGVufDB8fDB8fHww');
-        -webkit-background-size: cover;
-        -moz-background-size: cover;
-        -o-background-size: cover;
+        /*height: 100vh;*/
+        background-size: cover;
         background-repeat: no-repeat;
-        background-size: cover; 
-        height: 100vh;
+        background-position: center center;
     }
     .switch {position: relative; display: inline-block; width: 120px; height: 68px} 
     .switch input {display: none}
@@ -416,8 +419,14 @@ const char index_html[] PROGMEM = R"rawliteral(
   <div class="page_container">
      <!--display time-->
     <div style = "margin-bottom: 10px;">
-      <img class="status_icon" style = "width: 200px; height: 200px;"
-        src="https://cdn-icons-png.flaticon.com/512/483/483683.png" alt="happy_status">
+      <!--img class="status_icon" style = "width: 200px; height: 200px;"
+        src="https://cdn-icons-png.flaticon.com/512/483/483683.png" alt="happy_status"-->
+      <img class="status_icon" style = "
+        width: 256px;
+        height: 102px;
+        object-fit: cover;
+        border-radius: 25px;"
+        src="https://i.makeagif.com/media/12-18-2023/dWC1fB.gif" alt="happy_status">
     </div>
 
   <div class = "Date_Time_status">
@@ -451,8 +460,7 @@ const char index_html[] PROGMEM = R"rawliteral(
       </div>
       <div class = soil>
         <p class="Soild_sensor" style = "margin-bottom: 10px;
-          padding: 10px 5px;
-          height: 145px;">
+          padding: 10px 5px;">
           <span class="soil-labels"><a>&#127792;</a>Soil Moisture: </span>
           <span id="data">--</span>
         </p>
