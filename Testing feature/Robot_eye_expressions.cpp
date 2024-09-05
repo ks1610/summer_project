@@ -122,6 +122,7 @@ int tt=50;
 
 void loop(){
 
+// normal state
 display.clearDisplay();
 display.drawBitmap(xx, yy,emotes0,128,64, 1);
 display.display();
@@ -201,6 +202,10 @@ display.clearDisplay();
 display.drawBitmap(xx, yy,emotes15,128,64, 1);
 display.display();
 delay(tt);
+
+
+
+//touching state
 
 display.clearDisplay();
 display.drawBitmap(xx, yy,emotes16,128,64, 1);
@@ -337,6 +342,9 @@ display.drawBitmap(xx, yy,emotes42,128,64, 1);
 display.display();
 delay(tt);
 
+
+// Sad state
+
 display.clearDisplay();
 display.drawBitmap(xx, yy,emotes43,128,64, 1);
 display.display();
@@ -371,5 +379,6 @@ display.clearDisplay();
 display.drawBitmap(xx, yy,emotes49,128,64, 1);
 display.display();
 delay(tt);
+
 
 }
