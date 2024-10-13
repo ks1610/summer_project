@@ -2,7 +2,7 @@
 
 LiquidCrystal_I2C lcd(0x27, 16, 2); // Format -> (Address,Width,Height )
 
-char state[3] = {"1-2", "3-4", "5-6"};
+char *state[3] = {"1-2", "3-4", "5-6"};
 
 void setup()
 {
