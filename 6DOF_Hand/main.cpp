@@ -1,8 +1,11 @@
 #include <Servo.h>
+#include <LiquidCrystal_I2C.h>
 
-const int buttonPin = 2;  // the number of the pushbutton pin
-// variables will change:
-int buttonState = 0;  // variable for reading the pushbutton status
+LiquidCrystal_I2C lcd(0x27, 16, 2); // Format -> (Address, Width, Height)
+
+const int buttonPin = 12;  // Pushbutton pin
+int buttonState = 0;       // Current button state
+int lastButtonState = 0;   // Previous button state to detect changes
 
 // create 6 servo objects to control servos
 Servo myservo1;
@@ -23,6 +26,8 @@ int servo2_pos=90;
 byte switchPin = 1;                    // switch is connected to pin 2
 byte buttonPresses = 0;                // how many times the button has been pressed 
 
+int count = 0;
+
 void setup() {
 
   Serial.begin (9600) ;
@@ -40,11 +45,58 @@ void setup() {
   pinMode (joystick_x, INPUT) ;                     
   pinMode (joystick_y, INPUT) ;     
 
-  // initialize the pushbutton pin as an input:
-  pinMode(buttonPin, INPUT);
+  // Initialize the pushbutton pin with internal pull-up resistor:
+  pinMode(buttonPin, INPUT_PULLUP);
+  
+  // Initialize the LCD:
+  lcd.init();
+  lcd.backlight();
+  
+  // Display initial state as "NOT Pressed" (since pull-up means default HIGH):
+  lcd.setCursor(0, 0);
+  lcd.print("NOT Pressed");
 }
 
-void loop() {
+int button_count(){
+  // Read the current state of the pushbutton:
+  buttonState = digitalRead(buttonPin);
+  
+  // Check if the button state has changed:
+  if (buttonState != lastButtonState) {
+    // Debounce delay
+    delay(50);
+    
+    // Re-read the button state after debounce delay:
+    buttonState = digitalRead(buttonPin);
+    
+    // If the button is pressed (LOW due to pull-up resistor):
+    if (buttonState == LOW) {
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      count++;
+      lcd.print(count);
+      delay(500);
+    } 
+    // If the button is released (HIGH due to pull-up):
+    else {
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Current State");
+      lcd.setCursor(0, 1);
+      lcd.print(count);
+    }
+    if(count == 3)
+      count = 0;
+  }
+  
+  // Update lastButtonState to the current state:
+  lastButtonState = buttonState;
+
+  return count;
+}
+
+
+void DOF_1_2(){
   pos_x = analogRead (joystick_x) ;  
   pos_y = analogRead (joystick_y) ;                      
 
@@ -97,12 +149,130 @@ void loop() {
     delay (100) ;
     }
   }
-  if (buttonState == HIGH) {
-    // turn LED on:
-    myservo6.write(0) ;
-  } else {
-    // turn LED off:
-    myservo6.write(180) ;
+}
+
+void DOF_3_4(){
+  pos_x = analogRead (joystick_x) ;  
+  pos_y = analogRead (joystick_y) ;                      
+
+  if (pos_x < 300)            //if the horizontal value from joystick is less than 300
+  {
+    if (servo1_pos < 10)      //first servo moves right
+    { 
+    } 
+    else
+    { 
+      servo1_pos = servo1_pos - 20; 
+      myservo3.write ( servo1_pos ) ; 
+      delay (100); 
+    } 
+  } 
+  if (pos_x > 700)
+  {
+    if (servo1_pos > 180)
+    {  
+    }  
+    else
+    {
+    servo1_pos = servo1_pos + 20;
+    myservo3.write ( servo1_pos ) ;
+    delay (100) ;
+    }
   }
+
+  if (pos_y < 300)      //if the vertical value from joystick is less than 300
+  {
+    if (servo2_pos < 10)  //second servo moves right
+    { 
+    } 
+    else
+    { 
+      servo2_pos = servo2_pos - 20; 
+      myservo4.write ( servo2_pos ); 
+      delay (30); 
+    } 
+  } 
+  if (pos_y > 700)
+  {
+    if (servo2_pos > 180)
+    {  
+    }        
+    else
+    {
+    servo2_pos = servo2_pos + 20;
+    myservo4.write(servo2_pos) ;
+    delay (30) ;
+    }
+  }
+}
+
+void DOF_5_6(){
+  pos_x = analogRead (joystick_x) ;  
+  pos_y = analogRead (joystick_y) ;                      
+
+  if (pos_x < 300)            //if the horizontal value from joystick is less than 300
+  {
+    if (servo1_pos < 10)      //first servo moves right
+    { 
+    } 
+    else
+    { 
+      servo1_pos = servo1_pos - 20; 
+      myservo5.write ( servo1_pos ) ; 
+      delay (30); 
+    } 
+  } 
+  if (pos_x > 700)
+  {
+    if (servo1_pos > 180)
+    {  
+    }  
+    else
+    {
+    servo1_pos = servo1_pos + 20;
+    myservo5.write ( servo1_pos ) ;
+    delay (30) ;
+    }
+  }
+
+  if (pos_y < 300)      //if the vertical value from joystick is less than 300
+  {
+    if (servo2_pos < 10)  //second servo moves right
+    { 
+    } 
+    else
+    { 
+      servo2_pos = servo2_pos - 20; 
+      myservo6.write ( servo2_pos ); 
+      delay (30); 
+    } 
+  } 
+  if (pos_y > 700)
+  {
+    if (servo2_pos > 180)
+    {  
+    }        
+    else
+    {
+    servo2_pos = servo2_pos + 20;
+    myservo6.write(servo2_pos) ;
+    delay (30) ;
+    }
+  }
+}
+void loop() {
+  int state = button_count();
+  
+  switch(state){
+    case 0:
+      DOF_1_2();
+      break;
+    case 1:
+      DOF_3_4();
+      break;
+    case 2:
+      DOF_5_6();
+      break;
+  } 
 }
 
