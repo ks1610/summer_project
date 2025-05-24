@@ -1,3 +1,20 @@
+/*
+FS  //đi thẳng
+RS  //rẽ phải
+LS  //rẽ trái  
+BS  //đi lùi
+
+FL //thẳng chéo trái
+FR //thẳng chéo phải
+BL //Lùi chéo trái
+BR //Lùi chéo phải
+
+RL //Quay trái 
+RR //Quay phải
+
+EM //Dừng khẩn cấp
+*/
+
 #include<SoftwareSerial.h>
 
 /* Create object named bt of the class SoftwareSerial */ 
